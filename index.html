@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Rubik's Cube Solver Suite</title>
+    <script src="https://tailwindcss.com"></script>
+    <script src="https://cloudflare.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-cyan-500 selection:text-white">
+
+    <!-- Global App Header Navigation Bar Layout -->
+    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl font-black bg-gradient-to-r from-cyan-400 via-indigo-500 to-purple-600 bg-clip-text text-transparent tracking-tight">CUBE_CORE</span>
+                <span class="text-xs bg-slate-800 text-slate-400 font-mono tracking-widest px-2 py-0.5 rounded border border-slate-700">v2.1.0</span>
+            </div>
+            <div class="text-sm font-medium text-slate-400 flex items-center gap-2">
+                <div class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div> Backend Pipe Node Online
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Workspace Dashboard Grid Frame -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left Column Context Grid: 3D Graphics Viewport Space Matrix -->
+        <section class="lg:col-span-8 bg-slate-950 rounded-2xl border border-slate-800 shadow-2xl relative overflow-hidden min-h-[500px] flex flex-col">
+            <div class="absolute top-4 left-4 z-10 bg-slate-900/90 border border-slate-700/50 backdrop-blur px-3 py-1.5 rounded-lg text-xs font-mono tracking-wide text-slate-400 shadow-lg">
+                ENGINE_RENDER_VIEWPORT [WebGL_3D]
+            </div>
+            
+            <!-- Real-Time Interactive Canvas Wrapper -->
+            <div id="canvas-mount-point" class="w-full flex-1 cursor-grab active:cursor-grabbing"></div>
+            
+            <!-- Context Solution Indicator Monitoring Drawer Footer -->
+            <footer class="border-t border-slate-800 bg-slate-900/40 p-5 backdrop-blur flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-widest block mb-1">Algorithmic Solution Sequence</span>
+                    <div id="solution-stream" class="font-mono text-base font-bold text-cyan-400 tracking-wider transition-all duration-300">
+                        SYSTEM TERMINAL IDLE - WAITING FOR INPUT PATTERNS
+                    </div>
+                </div>
+                <div id="metrics-badge" class="hidden shrink-0 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-mono text-slate-300">
+                    MOVES: <span id="metrics-count" class="text-indigo-400 font-bold">0</span>
+                </div>
+            </footer>
+        </section>
+
+        <!-- Right Column Context Grid: Interactive System Operations Terminal -->
+        <section class="lg:col-span-4 flex flex-col gap-6">
+            
+            <!-- Quick Execution Controls Panel Group -->
+            <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 shadow-xl">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-2">
+                    ⚡ Operational Parameters
+                </h2>
+                
+                <div class="grid grid-cols-1 gap-3">
+                    <button id="scramble-trigger" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700 font-semibold py-3 px-4 rounded-xl transition duration-200 transform active:scale-[0.99] flex items-center justify-center gap-2 shadow-sm">
+                        🔄 Scramble Pattern
+                    </button>
+                    <button id="solve-trigger" class="w-full bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold py-3 px-4 rounded-xl transition duration-200 shadow-lg shadow-cyan-950/50 transform active:scale-[0.99] flex items-center justify-center gap-2">
+                        🚀 Run Optimization Solver
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pattern Sequence Data Stream Mapping Information -->
+            <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 shadow-xl flex-1 flex flex-col">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-2">
+                    📦 Cube State Def Definition
+                </h2>
+                <p class="text-xs text-slate-500 mb-4">54 characters formatted via standard face index layers: U, R, F, D, L, B</p>
+                
+                <textarea id="state-definition-input" class="w-full flex-1 bg-slate-900 border border-slate-800 rounded-xl p-4 font-mono text-sm text-cyan-300 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 resize-none transition" placeholder="Paste cube configuration pattern here...">DUUBULDBRBLRPRRFFURRRFUFLBRDDFDDLDFFLLLRLLLRRBBFBBBUBD</textarea>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- 3D Engine Operations Logic Context Setup Script -->
+    <script>
+        let scene, camera, renderer, cubeGroup;
+        const piecesArray = [];
+        
+        const palette = {
+            U: 0xf8fafc, // Up: White
+            D: 0xeab308, // Down: Yellow
+            L: 0x22c55e, // Left: Green
+            R: 0xef4444, // Right: Red
+            F: 0x3b82f6, // Front: Blue
+            B: 0xf97316  // Back: Orange
+        };
+
+        function initCoreViewport3D() {
+            const mountPoint = document.getElementById('canvas-mount-point');
+            
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(40, mountPoint.clientWidth / mountPoint.clientHeight, 0.1, 100);
+            camera.position.set(4.5, 4.5, 6.5);
+            camera.lookAt(0, 0, 0);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(mountPoint.clientWidth, mountPoint.clientHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            mountPoint.appendChild(renderer.domElement);
+
+            scene.add(new THREE.AmbientLight(0xffffff, 0.85));
+            const spotlight = new THREE.DirectionalLight(0xffffff, 0.4);
+            spotlight.position.set(8, 12, 8);
+            scene.add(spotlight);
+
+            cubeGroup = new THREE.Group();
+            const geometry = new THREE.BoxGeometry(0.94, 0.94, 0.94);
+
+            for (let x = -1; x <= 1; x++) {
+                for (let y = -1; y <= 1; y++) {
+                    for (let z = -1; z <= 1; z++) {
+                        const internalMaterials = [
+                            new THREE.MeshBasicMaterial({ color: x === 1 ? palette.R : 0x0f172a }),
+                            new THREE.MeshBasicMaterial({ color: x === -1 ? palette.L : 0x0f172a }),
+                            new THREE.MeshBasicMaterial({ color: y === 1 ? palette.U : 0x0f172a }),
+                            new THREE.MeshBasicMaterial({ color: y === -1 ? palette.D : 0x0f172a }),
+                            new THREE.MeshBasicMaterial({ color: z === 1 ? palette.F : 0x0f172a }),
+                            new THREE.MeshBasicMaterial({ color: z === -1 ? palette.B : 0x0f172a })
+                        ];
+
+                        const subMeshPiece = new THREE.Mesh(geometry, internalMaterials);
+                        subMeshPiece.position.set(x, y, z);
+                        cubeGroup.add(subMeshPiece);
+                        piecesArray.push(subMeshPiece);
+                    }
+                }
+            }
+            scene.add(cubeGroup);
+        }
+
+        function triggerRenderFrameLoop() {
+            requestAnimationFrame(triggerRenderFrameLoop);
+            if(cubeGroup) {
+                cubeGroup.rotation.y += 0.003;
+                cubeGroup.rotation.x = 0.28;
+            }
+            renderer.render(scene, camera);
+        }
+
+        // Local UI Local Randomizer Component Handler Scrambler Simulation Mock
+        document.getElementById('scramble-trigger').addEventListener('click', () => {
+            document.getElementById('solution-stream').innerText = "CALCULATING RANDOM MATRIX SCRAMBLE CONFIGURATION...";
+            piecesArray.forEach(mesh => {
+                mesh.rotation.x = (Math.floor(Math.random() * 4) * Math.PI) / 2;
+                mesh.rotation.y = (Math.floor(Math.random() * 4) * Math.PI) / 2;
+            });
+            document.getElementById('solution-stream').innerText = "CUBE PATTERN SCRAMBLED VISUALLY. INPUT DEF UPDATED.";
+        });
+
+        // Connected API Processing Logic Trigger Engine Block Call
+        document.getElementById('solve-trigger').addEventListener('click', async () => {
+            const patternString = document.getElementById('state-definition-input').value.trim();
+            const streamDisplay = document.getElementById('solution-stream');
+            const metricsBadge = document.getElementById('metrics-badge');
+            const metricsCount = document.getElementById('metrics-count');
+
+            streamDisplay.innerText = "POSTING COMPILATION PIPELINE PAYLOAD PACKETS TO SERVER...";
+            
+            try {
+                const apiResponse = await fetch('http://127.0.0', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ definition_string: patternString })
+                });
+
+                const data = await apiResponse.json();
+
+Use code with caution.if (data.is_success) {streamDisplay.innerText = data.raw_sequence || "CUBE IS ALREADY PERFECTLY SOLVED MATRIX CONTEXT!";metricsBadge.classList.remove('hidden');metricsCount.innerText = data.moves.length;// Instantly snap matrix position mapping geometries back to mappinghome
