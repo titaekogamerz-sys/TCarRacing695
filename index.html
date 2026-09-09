@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+
+  <title>Titaeko Thumb Studio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">T</div>
+      <div>
+        <strong>TITAEKO</strong>
+        <span>THUMB STUDIO</span>
+      </div>
+    </div>
+
+    <div class="project-title">
+      <input id="projectName" value="Untitled Thumbnail">
+    </div>
+
+    <div class="top-actions">
+      <button id="undoBtn">↶</button>
+      <button id="redoBtn">↷</button>
+      <button class="save-btn" id="saveBtn">💾 Save</button>
+      <button class="export-btn" id="exportBtn">⬇ Export</button>
+    </div>
+  </header>
+
+
+  <!-- MAIN -->
+  <main class="workspace">
+
+    <!-- LEFT TOOLBAR -->
+    <aside class="sidebar">
+
+      <button class="tool active" data-panel="templates">
+        <b>▦</b>
+        <span>Templates</span>
+      </button>
+
+      <button class="tool" data-panel="text">
+        <b>T</b>
+        <span>Text</span>
+      </button>
+
+      <button class="tool" data-panel="elements">
+        <b>◇</b>
+        <span>Elements</span>
+      </button>
+
+      <button class="tool" data-panel="emoji">
+        <b>😎</b>
+        <span>Emoji</span>
+      </button>
+
+      <button class="tool" data-panel="images">
+        <b>▣</b>
+        <span>Images</span>
+      </button>
+
+      <button class="tool" data-panel="background">
+        <b>◐</b>
+        <span>Colors</span>
+      </button>
+
+      <button class="tool" data-panel="layers">
+        <b>☷</b>
+        <span>Layers</span>
+      </button>
+
+      <div class="sidebar-bottom">
+        <button class="tool" data-panel="projects">
+          <b>▤</b>
+          <span>Projects</span>
+        </button>
+
+        <button class="tool" data-panel="settings">
+          <b>⚙</b>
+          <span>Settings</span>
+        </button>
+      </div>
+
+    </aside>
+
+
+    <!-- PANEL -->
+    <section class="panel" id="panel">
+
+      <div class="panel-head">
+        <div>
+          <h2 id="panelTitle">Templates</h2>
+          <p id="panelSub">Start quickly with a professional layout</p>
+        </div>
+        <button id="closePanel">×</button>
+      </div>
+
+      <div id="panelContent"></div>
+
+    </section>
+
+
+    <!-- CANVAS -->
+    <section class="canvas-area">
+
+      <div class="canvas-toolbar">
+        <button id="zoomOut">−</button>
+        <span id="zoomValue">100%</span>
+        <button id="zoomIn">+</button>
+
+        <div class="canvas-divider"></div>
+
+        <button id="fitBtn">Fit</button>
+        <button id="gridBtn">▦ Grid</button>
+      </div>
+
+      <div class="canvas-stage" id="stage">
+
+        <div class="thumbnail" id="thumbnail">
+
+          <div class="canvas-content" id="canvasContent">
+
+            <div class="layer text-layer title-layer"
+                 data-layer="title">
+              YOUR TITLE
+            </div>
+
+            <div class="layer text-layer small-layer"
+                 data-layer="small">
+              EPIC GAMING
+            </div>
+
+            <div class="layer emoji-layer"
+                 data-layer="emoji">
+              🔥
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- RIGHT PROPERTIES -->
+    <aside class="properties">
+
+      <div class="property-head">
+        <strong>Properties</strong>
+        <span id="selectedName">Nothing selected</span>
+      </div>
+
+      <div id="propertiesContent">
+
+        <div class="empty-properties">
+          <div>✦</div>
+          <strong>Select an element</strong>
+          <span>Click anything on the canvas to edit it.</span>
+        </div>
+
+      </div>
+
+    </aside>
+
+  </main>
+
+
+  <!-- MOBILE BOTTOM NAV -->
+  <nav class="mobile-nav">
+
+    <button data-panel="templates">▦<small>Design</small></button>
+    <button data-panel="text">T<small>Text</small></button>
+    <button data-panel="emoji">😎<small>Emoji</small></button>
+    <button data-panel="layers">☷<small>Layers</small></button>
+    <button data-panel="projects">▤<small>Projects</small></button>
+
+  </nav>
+
+</div>
+
+
+<!-- SAVE PROJECT MODAL -->
+<div class="modal" id="saveModal">
+
+  <div class="modal-card">
+
+    <div class="modal-top">
+      <h2>Save Project</h2>
+      <button id="closeSave">×</button>
+    </div>
+
+    <label>Project name</label>
+
+    <input id="saveName"
+           placeholder="My Gaming Thumbnail">
+
+    <div class="modal-actions">
+      <button class="cancel" id="cancelSave">Cancel</button>
+      <button class="primary" id="confirmSave">Save Project</button>
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- PROJECTS MODAL -->
+<div class="modal" id="projectsModal">
+
+  <div class="projects-card">
+
+    <div class="modal-top">
+      <div>
+        <h2>My Projects</h2>
+        <p>Your saved thumbnails stay here.</p>
+      </div>
+
+      <button id="closeProjects">×</button>
+    </div>
+
+    <div id="projectList"></div>
+
+  </div>
+
+</div>
+
+
+<input type="file" id="imageInput" accept="image/*" hidden>
+
+<script src="app.js"></script>
+
+</body>
+          </html>
